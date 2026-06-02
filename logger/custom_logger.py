@@ -1,4 +1,5 @@
 import logging
+import sys
 import os
 from datetime import datetime
 import structlog
@@ -25,11 +26,11 @@ class CustomLogger:
         file_handler.setLevel(logging.INFO)
         file_handler.setFormatter(logging.Formatter("%(message)s")) #Raw Json lines
 
-        console_handler = logging.StreamHandler()
+        console_handler = logging.StreamHandler(sys.stdout)
         console_handler.setLevel(logging.INFO)
         console_handler.setFormatter(logging.Formatter("%(message)s"))
 
-        logging.basicConfig(level=logging.INFO, format="%(message)s", handlers=[console_handler, file_handler])
+        logging.basicConfig(level=logging.INFO, format="%(message)s", handlers=[console_handler, file_handler], force=True)
 
         structlog.configure(
             processors=[
