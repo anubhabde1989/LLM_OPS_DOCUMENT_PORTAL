@@ -1,6 +1,6 @@
 import os 
 import sys
-import fitz
+import pymupdf as fitz
 import uuid
 from datetime import datetime 
 from logger.custom_logger import CustomLogger
@@ -22,21 +22,63 @@ class DocumentHandler:
         except Exception as e:
             raise DocumentPortalException("Error initializing DocumentHandler", sys) from e
 
-    def save_pdf(self, pdf_data):
+    def save_pdf(self, uploaded_file):
         try:
-            pass
+            filename =os.path.basename(uploaded_file.name)
+            if not filename.lower().endswith(".pdf"):
+                raise DocumentPortalException("Invalid file types. Only PDFs are allowed")
+
+            save_path = os.path.join(self.session_path, filename)
+            with open(save_path,"wb") as f:
+                f.write(uploaded_file.getbuffer())
+            
+            self.log.info("PDF saved successfully", filename = filename, save_path=save_path, session_id = self.session_id)
+
+            return save_path
+
         except Exception as e:
             self.log.error(f"Error saving PDF: {e}")
             raise DocumentPortalException("Error saving PDF", sys) from e 
                 
-    def read_pdf(self):
+    def read_pdf(self, pdf_path:str)->str:
         try:
-            pass
+            text_chunks = []
+            with fitz.open(pdf_path) as doc:
+                for page_num, page in enumerate(doc, start=1):
+                    text_chunks.append(f"\n-- Page {page_num} --\n{page.get_text()}")
+            text = "\n".join(text_chunks)
+
+            self.log.info("PDF read successfully", pdf_path = pdf_path, session_id = self.session_id)
+            return text
         except Exception as e:
             self.log.error(f"Error reading PDF: {e}")
             raise DocumentPortalException("Error reading PDF", sys) from e
 
 if __name__ == "__main__":
+    from pathlib import Path
+    from io import BytesIO
+    
+    pdf_path = r"D:\\LLM Ops Project\\document_portal\\data\\document_analysis\\NIPS-2017-attention-is-all-you-need-Paper.pdf"
+    class DummyFile:
+        def __init__(self, file_path):
+            self.name = Path(file_path).name
+            self._file_path = file_path
+        def getbuffer(self):
+            return open(self._file_path,"rb").read()
+        
+    dummy_pdf = DummyFile(pdf_path)
+
     handler = DocumentHandler()
+    try:
+        saved_path = handler.save_pdf(dummy_pdf)
+        print(saved_path)
+
+        content = handler.read_pdf(saved_path)
+        print("PDF Content")
+        print(content[:500])
+    except Exception as e:
+        print(f"Error: {e}")
+
+
     print(f"Session ID: {handler.session_id}")
     print(f"Session path: {handler.session_path}")

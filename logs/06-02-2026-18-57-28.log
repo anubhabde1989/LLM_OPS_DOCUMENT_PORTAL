@@ -1,1 +1,0 @@
-[2026-06-02 18:57:28,048] INFO custom_logger.py (line:51) - {"timestamp": "2026-06-02T13:27:28.048225Z", "level": "info", "event": "Custom logger initialized successfully."}

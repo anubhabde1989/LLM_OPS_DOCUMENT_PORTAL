@@ -1,5 +1,0 @@
-[2026-06-01 20:21:25,055] ERROR custom_exception.py (line:30) - 
-                Error in [D:\LLM Ops Project\document_portal\exception\custom_exception.py] at line [26]
-                Messsage: division by zero
-                Traceback: ['Traceback (most recent call last):\n', '  File "D:\\LLM Ops Project\\document_portal\\exception\\custom_exception.py", line 26, in <module>\n    a=1/0\n', 'ZeroDivisionError: division by zero\n']
-                
